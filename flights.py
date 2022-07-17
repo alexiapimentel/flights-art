@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from geopy.distance import geodesic as GD
 import matplotlib.pyplot as plt
 import matplotlib.colors as mc
 import matplotlib.cm as cmx
