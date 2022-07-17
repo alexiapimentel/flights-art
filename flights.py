@@ -24,12 +24,12 @@ def load_data() -> pd.DataFrame:
 def create_canvas(airports) -> go.Figure():
     fig = go.Figure()
     fig.add_trace(go.Scattergeo(lon=airports['LONGEOPOINT'], lat=airports['LATGEOPOINT'], mode='markers', marker=dict(size=0.1)))
-    fig.update_layout(geo=dict(scope='south america', fitbounds='locations', center=dict(lat=-13.0, lon=-53.2), showland=False, showocean=False, showcoastlines=False, showcountries=False, bgcolor='rgb(29,29,29)'))
-    fig.update_layout(paper_bgcolor = 'black', plot_bgcolor = 'black')
+    fig.update_layout(geo=dict(scope='south america', fitbounds='locations', center=dict(lat=-13.0, lon=-53.2), showland=False, showocean=False, showcoastlines=False, showcountries=False, bgcolor='#000000'))
+    fig.update_layout(paper_bgcolor = '#000000', plot_bgcolor = '#000000')
     fig.update_xaxes(showticklabels=False, showgrid=False, zeroline=False, visible=False)
     fig.update_yaxes(showticklabels=False, showgrid=False, zeroline=False, visible=False)
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-    fig.update_layout(template='plotly_dark', showlegend=False, height=600, width=300)
+    fig.update_layout(template='plotly_dark', showlegend=False)
     return fig
 
 if __name__ == '__main__':
