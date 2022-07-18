@@ -8,6 +8,7 @@ import time
 import numpy as np
 import ast
 import random
+from pathlib import Path
 
 
 def load_data() -> pd.DataFrame:
@@ -33,41 +34,46 @@ def create_canvas(airports) -> go.Figure():
 
 if __name__ == '__main__':
     st.set_page_config(layout="wide")
+    about, art = st.tabs(["Sobre 📘", "Flights-Art 🎨"])
 
+    with about:
+        md = Path("README.md").read_text(encoding='utf-8')
+        st.markdown(md, unsafe_allow_html=True)
     
-    hourly_flights, airports = load_data()
-    canvas = create_canvas(airports)
-    canvas_plot = st.empty()
-    previous_flight_date = hourly_flights['data_partida'][0]
+    with art:
+        hourly_flights, airports = load_data()
+        canvas = create_canvas(airports)
+        canvas_plot = st.empty()
+        previous_flight_date = hourly_flights['data_partida'][0]
 
-    colorscales = [plt.cm.inferno, plt.cm.viridis, plt.cm.plasma, plt.cm.hot, plt.cm.Blues]
-    for colorscale in colorscales:
-        norm = mc.Normalize(min(hourly_flights['tot_dist']), max(hourly_flights['tot_dist']))
-        colors = cmx.ScalarMappable(cmap=colorscale, norm=norm).to_rgba(hourly_flights['tot_dist'], bytes=True)
-        colors = ['rgba(' + str(x[0]) + ', ' + str(x[1]) + ', ' + str(x[2]) + ', ' + str(x[3]) + ')' for x in colors]
-        hourly_flights[colorscale.name] = colors
-    
-    for index, hf in hourly_flights.iterrows():    
-        # vetorizando latitude e longitudes em uma mesma hora de partida para melhorar performance
-        lons = []
-        lats = []
-        lons = np.empty(3 * len(hf['lon_origem']))
-        lons[::3] = hf['lon_origem']
-        lons[1::3] = hf['lon_destino']
-        lons[2::3] = None
-        lats = np.empty(3 * len(hf['lon_origem']))
-        lats[::3] = hf['lat_origem']
-        lats[1::3] =  hf['lat_destino']
-        lats[2::3] = None
+        colorscales = [plt.cm.inferno, plt.cm.viridis, plt.cm.plasma, plt.cm.hot, plt.cm.Blues]
+        for colorscale in colorscales:
+            norm = mc.Normalize(min(hourly_flights['tot_dist']), max(hourly_flights['tot_dist']))
+            colors = cmx.ScalarMappable(cmap=colorscale, norm=norm).to_rgba(hourly_flights['tot_dist'], bytes=True)
+            colors = ['rgba(' + str(x[0]) + ', ' + str(x[1]) + ', ' + str(x[2]) + ', ' + str(x[3]) + ')' for x in colors]
+            hourly_flights[colorscale.name] = colors
         
-        current_flight_date = hf['data_partida']
-        if current_flight_date != previous_flight_date:
-            canvas = create_canvas(airports)
-            previous_flight_date = current_flight_date
-        
-        # escolhendo colorscale aleatório
-        choosen_scale = random.choice(colorscales)
-        colors = hourly_flights[choosen_scale.name]
-        canvas.add_trace(go.Scattergeo(lon=lons, lat=lats, mode='lines+markers', marker=dict(size=0.2), line=dict(color=colors[index], width=0.2), opacity=random.randrange(1, 5)/10))
-        canvas_plot.plotly_chart(canvas, use_container_width=True)
-        time.sleep(0.1)
+        for index, hf in hourly_flights.iterrows():    
+            # vetorizando latitude e longitudes em uma mesma hora de partida para melhorar performance
+            lons = []
+            lats = []
+            lons = np.empty(3 * len(hf['lon_origem']))
+            lons[::3] = hf['lon_origem']
+            lons[1::3] = hf['lon_destino']
+            lons[2::3] = None
+            lats = np.empty(3 * len(hf['lon_origem']))
+            lats[::3] = hf['lat_origem']
+            lats[1::3] =  hf['lat_destino']
+            lats[2::3] = None
+            
+            current_flight_date = hf['data_partida']
+            if current_flight_date != previous_flight_date:
+                canvas = create_canvas(airports)
+                previous_flight_date = current_flight_date
+            
+            # escolhendo colorscale aleatório
+            choosen_scale = random.choice(colorscales)
+            colors = hourly_flights[choosen_scale.name]
+            canvas.add_trace(go.Scattergeo(lon=lons, lat=lats, mode='lines+markers', marker=dict(size=0.2), line=dict(color=colors[index], width=0.2), opacity=random.randrange(1, 5)/10))
+            canvas_plot.plotly_chart(canvas, use_container_width=True)
+            time.sleep(0.1)
